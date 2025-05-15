@@ -63,20 +63,20 @@ sed -i "" 's/#PermitRootLogin no/PermitRootLogin yes/' /etc/ssh/sshd_config
 #		pkg delete -fa
 # This resplace of set -e which force the script to finish in case of non status code 0 has to be inplace
 sed -i "" "s/set -e/#set -e/g" opnsense-bootstrap.sh.in
-sed -i "" "s/reboot/shutdown -r +1/g" opnsense-bootstrap.sh.in
+sed -i "" "s/reboot/#reboot/g" opnsense-bootstrap.sh.in
 sh ./opnsense-bootstrap.sh.in -y -r "$2"
 
-pkg install -y python311 sudo vim
+#pkg install -y python311 py311-setuptools sudo vim
+ln -s /usr/local/bin/python3.11 /usr/local/bin/python
 
 # Add Azure waagent
 fetch https://github.com/Azure/WALinuxAgent/archive/refs/tags/v$3.tar.gz
 tar -xvzf v$3.tar.gz
 cd WALinuxAgent-$3/
-python3 setup.py install --register-service --lnx-distro=freebsd --force
+python setup.py install --register-service --lnx-distro=freebsd --force
 cd ..
 
 # Fix waagent by replacing configuration settings
-ln -s /usr/local/bin/python3.11 /usr/local/bin/python
 ##sed -i "" 's/command_interpreter="python"/command_interpreter="python3"/' /etc/rc.d/waagent
 ##sed -i "" 's/#!\/usr\/bin\/env python/#!\/usr\/bin\/env python3/' /usr/local/sbin/waagent
 sed -i "" 's/ResourceDisk.EnableSwap=y/ResourceDisk.EnableSwap=n/' /etc/waagent.conf
